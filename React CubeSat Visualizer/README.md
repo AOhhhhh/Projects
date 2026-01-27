@@ -1,7 +1,7 @@
 # Quetzal-1 Mission Operations Dashboard
 
 <div align="center">
-  <img src="assets/demo.gif" width="800" alt="Quetzal-1 Dashboard Demonstration" />
+  <img src="tutorial.gif" width="800" alt="Quetzal-1 Dashboard Demonstration" />
 </div>
 
 ## Overview
