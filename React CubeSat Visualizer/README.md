@@ -25,13 +25,8 @@ The telemetry used in this project is sourced from the **Quetzal-1 mission**. Th
 - **Data Engineering:** Python (Preprocessing), MATLAB (Initial mission data generation)
 - **deployment:** GitHub Pages / Vite
 
-## Getting Started
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/AOhhhhh/Projects.git](https://github.com/AOhhhhh/Projects.git)
-   cd "React CubeSat Visualizer"
-
 ## How to Run
 1. git clone [https://github.com/AOhhhhh/Projects.git](https://github.com/AOhhhhh/Projects.git)
-2. Install dependencies: `npm install`
-3. Start the dashboard: `npm run dev`
+2. cd "React CubeSat Visualizer"
+3. Install dependencies: `npm install`
+4. Start the dashboard: `npm run dev`
