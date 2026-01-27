@@ -1,0 +1,548 @@
+/* ============================================
+   Quetzal-1 Mission Operations Console
+   Dark Sci-Fi Theme (SpaceX/NASA Style)
+   ============================================ */
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Color palette */
+  --bg-primary: #000000;
+  --bg-panel: rgba(10, 10, 15, 0.9);
+  --border-color: rgba(80, 80, 100, 0.4);
+  --text-primary: #e0e0e0;
+  --text-secondary: #888;
+  --text-muted: #555;
+
+  /* Status colors */
+  --color-gold: #ffd700;
+  --color-blue: #0064ff;
+  --color-green: #00ff88;
+  --color-magenta: #ff00ff;
+  --color-red: #ff5050;
+  --color-white: #ffffff;
+
+  /* Fonts */
+  --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* ============================================
+   Main Application Container
+   ============================================ */
+.app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: var(--bg-primary);
+}
+
+/* Loading screen */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  gap: 16px;
+}
+
+.loading .spin {
+  animation: spin 2s linear infinite;
+  color: var(--color-gold);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   DeckGL / Globe Container
+   ============================================ */
+.earth-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 30% 30%, #1a1a2e 0%, #000 70%);
+}
+
+/* ============================================
+   Top Overlay - Header Bar
+   ============================================ */
+.top-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+  z-index: 100;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mission-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mission-header svg {
+  color: var(--color-gold);
+}
+
+.mission-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.mission-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.mission-time .label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.mission-time .clock {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--color-green);
+  letter-spacing: 1px;
+}
+
+.status-badges {
+  display: flex;
+  gap: 12px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid;
+}
+
+.badge.sunlit {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+.badge.eclipse {
+  background: rgba(0, 100, 255, 0.15);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.badge.pass {
+  background: rgba(0, 255, 136, 0.15);
+  border-color: var(--color-green);
+  color: var(--color-green);
+}
+
+.badge.fault {
+  background: rgba(255, 0, 0, 0.2);
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+/* Blinking animation for fault warnings */
+.badge.blink {
+  animation: blink 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes blink {
+  from { opacity: 1; }
+  to { opacity: 0.4; }
+}
+
+/* ============================================
+   Left Panel - Telemetry Display
+   ============================================ */
+.left-panel {
+  position: absolute;
+  top: 80px;
+  left: 16px;
+  width: 200px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.left-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.left-panel h2 svg {
+  color: var(--color-green);
+}
+
+.telemetry-value {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.telemetry-value .label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.telemetry-value .value {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--color-green);
+}
+
+.telemetry-value .value.warning {
+  color: var(--color-red);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Playback Controls */
+.playback-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.playback-controls button {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--color-green);
+  border-radius: 4px;
+  color: var(--color-green);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.playback-controls button:hover {
+  background: rgba(0, 255, 136, 0.25);
+}
+
+.playback-controls select {
+  width: 60px;
+  padding: 8px;
+  background: rgba(50, 50, 60, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* Legend */
+.legend {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.legend h3 {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.legend-item .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot.gold { background: var(--color-gold); }
+.dot.blue { background: var(--color-blue); }
+.dot.green { background: var(--color-green); }
+.dot.magenta { background: var(--color-magenta); }
+.dot.red { background: var(--color-red); }
+
+/* ============================================
+   Right Panel - Pass Schedule
+   ============================================ */
+.right-panel {
+  position: absolute;
+  top: 80px;
+  right: 16px;
+  width: 280px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+}
+
+.right-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.right-panel h2 svg {
+  color: var(--color-green);
+}
+
+.right-panel .subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Pass Schedule Table */
+.pass-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.pass-table th {
+  text-align: left;
+  padding: 8px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pass-table td {
+  padding: 10px 6px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(50, 50, 60, 0.3);
+}
+
+.pass-table tbody tr {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pass-table tbody tr:hover {
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.pass-table tbody tr.active {
+  background: rgba(0, 255, 136, 0.2);
+  border-left: 3px solid var(--color-green);
+}
+
+.pass-table tbody tr.active td {
+  color: var(--color-green);
+}
+
+.pass-table tbody tr.past {
+  opacity: 0.4;
+}
+
+/* ============================================
+   Bottom Panel - Chart and Scrubber
+   ============================================ */
+.bottom-panel {
+  position: absolute;
+  bottom: 0;
+  left: 230px;
+  right: 310px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 12px 16px 8px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.chart-header h2 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+}
+
+.chart-status {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.chart-container {
+  margin-bottom: 8px;
+}
+
+/* Recharts customization */
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+/* Scrubber / Timeline Slider */
+.scrubber {
+  width: 100%;
+  padding: 4px 0;
+}
+
+.scrubber input[type="range"] {
+  width: 100%;
+  height: 6px;
+  appearance: none;
+  background: linear-gradient(90deg, var(--color-green) 0%, rgba(0, 255, 136, 0.2) 100%);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.scrubber input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--color-green);
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 0 10px var(--color-green);
+}
+
+.scrubber input[type="range"]::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+
+.scrubber input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--color-green);
+  border-radius: 50%;
+  border: none;
+  cursor: grab;
+  box-shadow: 0 0 10px var(--color-green);
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+@media (max-width: 1200px) {
+  .left-panel {
+    width: 180px;
+  }
+
+  .right-panel {
+    width: 240px;
+  }
+
+  .bottom-panel {
+    left: 200px;
+    right: 260px;
+  }
+}
+
+@media (max-width: 900px) {
+  .left-panel {
+    display: none;
+  }
+
+  .bottom-panel {
+    left: 16px;
+  }
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(20, 20, 30, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 120, 0.6);
+}

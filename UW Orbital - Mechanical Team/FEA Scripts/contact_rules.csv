@@ -1,0 +1,6 @@
+Material1,Material2,ContactType,Friction
+Aluminum Alloy,Aluminum Alloy,Bonded,0
+Aluminum Alloy,Stainless Steel,Frictional,0.4
+Stainless Steel,Stainless Steel,Frictional,0.5
+PLA (3D Printed),Stainless Steel,Frictional,0.3
+FR-4 (PCB),Stainless Steel,Frictional,0.25
