@@ -23,7 +23,6 @@ The telemetry used in this project is sourced from the **Quetzal-1 mission**. Th
 ## Tech Stack
 - **Frontend:** React.js, Deck.gl, Mapbox GL, Recharts
 - **Data Engineering:** Python (Preprocessing), MATLAB (Initial mission data generation)
-- **deployment:** GitHub Pages / Vite
 
 ## How to Run
 1. git clone [https://github.com/AOhhhhh/Projects.git](https://github.com/AOhhhhh/Projects.git)
