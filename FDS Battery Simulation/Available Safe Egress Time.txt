@@ -1,0 +1,1 @@
+Available Safe Egress Time is 4 seconds (Viz_Hazard drops below 13.5 seconds)

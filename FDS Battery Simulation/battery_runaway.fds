@@ -1,0 +1,40 @@
+&HEAD CHID='battery_runaway', TITLE='Li-Ion Battery Thermal Runaway' /
+
+! --- 1. THE DOMAIN (3m x 3m x 3m Room) ---
+! Cell size is 0.1m (10cm). Total cells = 30x30x30 = 27,000 (Runs fast)
+&MESH IJK=30,30,30, XB=0.0,3.0,0.0,3.0,0.0,3.0 /
+&TIME T_END=300.0 /  ! Run for 5 minutes
+
+! --- 2. THE FIRE (The Battery) ---
+! We define a surface (SURF) that releases heat and smoke
+! HRRPUA: Heat Release Rate per Unit Area (kW/m2). 2500 is intense.
+! RAMP_Q: Tells the fire to grow over time (t-squared growth)
+&SURF ID='BATTERY_SURF', HRRPUA=2500.0, COLOR='RED', RAMP_Q='fast_growth' /
+
+! The Growth Curve (Ultra-Fast t-squared)
+&RAMP ID='fast_growth', T=0.0, F=0.0 /
+&RAMP ID='fast_growth', T=60.0, F=1.0 /  ! Reaches peak at 60s
+&RAMP ID='fast_growth', T=300.0, F=1.0 /
+
+! The Fuel Chemistry (Li-Ion batteries produce dirty smoke)
+! SOOT_YIELD=0.10 is heavy smoke (standard for plastics/batteries)
+&REAC FUEL='PROPANE', SOOT_YIELD=0.10 /
+
+! --- 3. GEOMETRY (The Setup) ---
+! Open Door (Standard Door Height 2.0m)
+&VENT MB='XMAX', SURF_ID='OPEN', OBST_ID='DOOR_FRAME' /
+
+! The Battery Pack (0.5m box in center)
+&OBST XB=1.25,1.75, 1.25,1.75, 0.0,0.5, SURF_IDS='BATTERY_SURF','INERT','INERT' /
+
+! --- 4. SENSORS (The Data) ---
+! Measure Visibility at "Head Height" (1.8m) in the center of the room
+&DEVC ID='Vis_HeadHeight', QUANTITY='VISIBILITY', XYZ=1.5,1.5,1.8 /
+! Measure Temperature at Ceiling (to compare with CFAST)
+&DEVC ID='Temp_Ceiling', QUANTITY='TEMPERATURE', XYZ=1.5,1.5,2.9 /
+
+! Visualize the smoke and temp
+&SLCF PBY=1.5, QUANTITY='VISIBILITY' /
+&SLCF PBY=1.5, QUANTITY='TEMPERATURE' /
+
+&TAIL /

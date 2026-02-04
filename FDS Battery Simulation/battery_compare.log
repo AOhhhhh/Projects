@@ -1,0 +1,10 @@
+
+CFAST
+
+Release Version  : CFAST 7.7.5
+Revision         : CFAST-7.7.5-0-g6feca9299-release
+Revision Date    : Sun May 4 19:27:47 2025 -0400
+Compilation Date : Sun 05/04/2025  09:07 PM
+
+Error on line 19 of the input file: &FIRE ID = 'New Fire 2'  COMP_ID = '', FIRE_ID = 'New Fire 2'  LOCATION = 0, 0 /
+***Error exit from CFAST, error 3 from routine read_fire

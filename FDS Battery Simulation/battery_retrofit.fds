@@ -1,0 +1,61 @@
+&HEAD CHID='battery_retrofit', TITLE='Senez Test Cell Retrofit' /
+
+! --- 1. MESH (Perfect 10cm Cubes) ---
+! Domain: 5.4m x 3.2m x 3.0m
+! IJK adjusted to 54, 32, 30 for perfect cubic cells
+&MESH IJK=54,32,30, XB=-0.2,5.2, -0.2,3.0, 0.0,3.0 /
+
+&TIME T_END=150.0 /
+&DUMP NFRAMES=300 /
+
+! --- 2. CHEMISTRY (The Missing Link) ---
+! We use Propane properties to simulate the battery smoke
+&REAC FUEL='PROPANE', SOOT_YIELD=0.10 /
+
+! --- 3. GEOMETRY: TEST CELL (The Hazard) ---
+! Walls are 0.2m thick concrete (Gray)
+&OBST XB=0.0,3.0, 3.0,3.2, 0.0,3.0, SURF_ID='INERT' / ! North
+&OBST XB=-0.2,0.0, 0.0,3.0, 0.0,3.0, SURF_ID='INERT' / ! West
+&OBST XB=0.0,1.2, -0.2,0.0, 0.0,3.0, SURF_ID='INERT' / ! South (Left of Door)
+&OBST XB=2.0,3.0, -0.2,0.0, 0.0,3.0, SURF_ID='INERT' / ! South (Right of Door)
+
+! --- 4. GEOMETRY: CONTROL ROOM (The Safety Interface) ---
+! Control Room Walls
+&OBST XB=5.0,5.2, 0.0,3.0, 0.0,3.0, SURF_ID='INERT' / ! Far East Wall
+&OBST XB=3.0,5.0, 3.0,3.2, 0.0,3.0, SURF_ID='INERT' / ! North
+&OBST XB=3.0,5.0, -0.2,0.0, 0.0,3.0, SURF_ID='INERT' / ! South
+
+! Divider Wall (Between Test Cell and Control Room)
+! We split this wall into "Top" and "Bottom" to frame the window
+&OBST XB=3.0,3.2, 0.0,1.0, 0.0,3.0, SURF_ID='INERT' / ! Wall Left of Window
+&OBST XB=3.0,3.2, 2.0,3.0, 0.0,3.0, SURF_ID='INERT' / ! Wall Right of Window
+&OBST XB=3.0,3.2, 1.0,2.0, 0.0,1.0, SURF_ID='INERT' / ! Wall Below Window
+&OBST XB=3.0,3.2, 1.0,2.0, 2.0,3.0, SURF_ID='INERT' / ! Wall Above Window
+
+! THE WINDOW (Solid Glass Block)
+! Transparency allows you to see through it in PyroSim, but it blocks smoke
+&OBST XB=3.0,3.2, 1.0,2.0, 1.0,2.0, COLOR='BLUE', TRANSPARENCY=0.5 /
+
+! --- 5. VENTILATION ---
+! Open the South boundary to simulate the warehouse space
+&VENT MB='YMIN', SURF_ID='OPEN' / 
+
+! --- 6. THE FIRE (Ultra-Fast Battery Fire) ---
+! 0.6m x 0.6m Battery Pack in center of Test Cell
+&OBST XB=1.2,1.8, 1.2,1.8, 0.0,0.5, SURF_ID='INERT', COLOR='GRAY' /
+&VENT XB=1.2,1.8, 1.2,1.8, 0.5,0.5, SURF_ID='BATTERY_FIRE' /
+
+&SURF ID='BATTERY_FIRE', HRRPUA=2500.0, COLOR='RED', RAMP_Q='fire_ramp' /
+&RAMP ID='fire_ramp', T=0.0, F=0.0 /
+&RAMP ID='fire_ramp', T=100.0, F=1.0 /
+&RAMP ID='fire_ramp', T=300.0, F=1.0 /
+
+! --- 7. SENSORS (Critical Data) ---
+! Visibility at head height (1.8m) inside the Hazard Room
+&DEVC ID='Vis_Door', QUANTITY='VISIBILITY', XYZ=1.5, 0.5, 1.8 /
+
+! Slices to visualize smoke and heat
+&SLCF PBY=1.5, QUANTITY='VISIBILITY' /
+&SLCF PBY=1.5, QUANTITY='TEMPERATURE' /
+
+&TAIL /
